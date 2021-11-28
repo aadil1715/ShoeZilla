@@ -49,8 +49,24 @@ exports.getAProduct = (req, res) => {
 }
 
 exports.listProducts = (req, res) => {
-    return res.status(200).json({
-        message: "Products to be listed"
+    const params = {TableName: tables.products};
+
+    db.scan(params, (err, data) => {
+        if (err) {
+            console.log(err);
+            return res.status(400).json({
+                message: "Failed to get all the product details",
+                error: err,
+                operation: "failure"
+            })
+        } else {
+            return res.status(200).json({
+                message: "Found the list of the products",
+                data: data.Items,
+                operation: "success"
+            })
+        }
+
     })
 }
 
@@ -148,6 +164,42 @@ exports.createProduct = (req, res) => {
                 });
             }
         })
+
+    })
+
+}
+
+exports.deleteProduct = (req, res) => {
+    const id = req.product.id.S;
+    if (!req.product) {
+        return res.status(400).json({
+            message: "Kindly send a valid product id",
+            error: "No product found for the given id",
+            operation: "failure"
+        })
+    }
+
+    const params = {
+        TableName: tables.products,
+        Key: {
+            id: {S: id.toString()}
+        }
+    };
+
+    db.deleteItem(params, (err, data) => {
+        if (err) {
+            console.log(err)
+            return res.status(400).json({
+                message: "Failed to delete the product",
+                error: err,
+                operation: "failure"
+            })
+        } else {
+            return res.status(200).json({
+                message: "Successfully Deleted the product with id: " + id,
+                operation: "success"
+            })
+        }
 
     })
 
