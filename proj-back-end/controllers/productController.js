@@ -3,6 +3,50 @@ const fs = require('fs');
 const {buckets, tables, region} = require('../config');
 const AWS = require('aws-sdk');
 AWS.config.update({region})
+const db = new AWS.DynamoDB();
+
+exports.getProductById = (req, res, next, id) => {
+
+    if (!id) {
+        return res.send("Invalid Id");
+    }
+
+    const getParams = {
+        TableName: tables.products,
+        Key: {
+            id: {S: id}
+        }
+    }
+    db.getItem(getParams, (err, result) => {
+        if (err || !result) {
+            return res.status(400).json({
+                message: "Failed to get the product details for id " + id,
+                error: err,
+                operation: "failure"
+            })
+        } else {
+            req.product = result.Item;
+            next();
+        }
+    })
+
+}
+
+exports.getAProduct = (req, res) => {
+    if (!req.product) {
+        return res.status(400).json({
+            message: "Failed to populate the product on request body",
+            error: "Expected an object with properties instead got a empty object",
+            operation: "failure"
+        })
+    } else {
+        return res.status(200).json({
+            message: "Product Details Found",
+            data: req.product,
+            operation: "success"
+        })
+    }
+}
 
 exports.listProducts = (req, res) => {
     return res.status(200).json({
@@ -75,8 +119,6 @@ exports.createProduct = (req, res) => {
         uploadFileToS3(file, id, res);
 
         // Upload the product details to DynamoDB
-        const db = new AWS.DynamoDB();
-
         // Build DynamoDB Params
         const productParams = {
             TableName: tables.products,
