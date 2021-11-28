@@ -6,6 +6,7 @@ const cors = require('cors');
 const debug = require('debug')('index:');
 const productRouter = require("./routes/productRouter");
 const orderRouter = require("./routes/orderRouter");
+const userRouter = require('./routes/userRoute');
 
 
 // App Initialization
@@ -22,6 +23,7 @@ app.use(cors());
 // Routers
 app.use('/', productRouter);
 app.use('/', orderRouter);
+app.use('/', userRouter);
 
 
 // Start listening to the requests
