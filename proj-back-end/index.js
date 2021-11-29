@@ -16,6 +16,7 @@ const port = process.env.PORT || 5050;
 
 // Middleware
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser())
 app.use(cors());
 

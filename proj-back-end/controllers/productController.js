@@ -1,6 +1,9 @@
 const formidable = require('formidable');
 const fs = require('fs');
 const {buckets, tables, region} = require('../config');
+const {v4: uuid} = require('uuid');
+
+// Aws Configuration
 const AWS = require('aws-sdk');
 AWS.config.update({region})
 const db = new AWS.DynamoDB();
@@ -35,8 +38,8 @@ exports.getProductById = (req, res, next, id) => {
 exports.getAProduct = (req, res) => {
     if (!req.product) {
         return res.status(400).json({
-            message: "Failed to populate the product on request body",
-            error: "Expected an object with properties instead got a empty object",
+            message: "No Product found",
+            error: "Invalid Id passed for the product id",
             operation: "failure"
         })
     } else {
@@ -112,7 +115,8 @@ exports.createProduct = (req, res) => {
         }
 
         // De-Structure the fields
-        const {id, name, description, price, stock} = fields;
+        const id = uuid();
+        const {name, description, price, stock} = fields;
 
         if (!id || !name || !description || !price || !stock) {
             return res.status(400).json({
@@ -201,6 +205,45 @@ exports.deleteProduct = (req, res) => {
             })
         }
 
+    })
+
+}
+
+exports.updateProduct = (req, res) => {
+
+    if (!req.body) {
+        return res.status(400).json({
+            message: "Place the data in the ",
+            error: "no body in req....",
+            operation: "failure"
+        })
+    }
+    const id = req.product.id.S;
+    const {name, description, price, stock} = req.body;
+    const params = {
+        TableName: tables.products,
+        Item: {
+            id: {S: id},
+            name: {S: name || req.product.name.S},
+            description: {S: description || req.product.description.S},
+            price: {N: price.toString() },
+            stock: {N: stock.toString() }
+        }
+    }
+
+    db.putItem(params, (err) => {
+        if (err) {
+            return res.status(400).json({
+                message: "Failed to update the product",
+                error: err,
+                operation: "failure"
+            })
+        } else {
+            return res.status(200).json({
+                message: "Successfully updated the product for id: " + id,
+                operation: "success"
+            });
+        }
     })
 
 }
