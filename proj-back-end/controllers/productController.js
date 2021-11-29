@@ -3,10 +3,70 @@ const fs = require('fs');
 const {buckets, tables, region} = require('../config');
 const AWS = require('aws-sdk');
 AWS.config.update({region})
+const db = new AWS.DynamoDB();
+
+exports.getProductById = (req, res, next, id) => {
+
+    if (!id) {
+        return res.send("Invalid Id");
+    }
+
+    const getParams = {
+        TableName: tables.products,
+        Key: {
+            id: {S: id}
+        }
+    }
+    db.getItem(getParams, (err, result) => {
+        if (err || !result) {
+            return res.status(400).json({
+                message: "Failed to get the product details for id " + id,
+                error: err,
+                operation: "failure"
+            })
+        } else {
+            req.product = result.Item;
+            next();
+        }
+    })
+
+}
+
+exports.getAProduct = (req, res) => {
+    if (!req.product) {
+        return res.status(400).json({
+            message: "Failed to populate the product on request body",
+            error: "Expected an object with properties instead got a empty object",
+            operation: "failure"
+        })
+    } else {
+        return res.status(200).json({
+            message: "Product Details Found",
+            data: req.product,
+            operation: "success"
+        })
+    }
+}
 
 exports.listProducts = (req, res) => {
-    return res.status(200).json({
-        message: "Products to be listed"
+    const params = {TableName: tables.products};
+
+    db.scan(params, (err, data) => {
+        if (err) {
+            console.log(err);
+            return res.status(400).json({
+                message: "Failed to get all the product details",
+                error: err,
+                operation: "failure"
+            })
+        } else {
+            return res.status(200).json({
+                message: "Found the list of the products",
+                data: data.Items,
+                operation: "success"
+            })
+        }
+
     })
 }
 
@@ -75,8 +135,6 @@ exports.createProduct = (req, res) => {
         uploadFileToS3(file, id, res);
 
         // Upload the product details to DynamoDB
-        const db = new AWS.DynamoDB();
-
         // Build DynamoDB Params
         const productParams = {
             TableName: tables.products,
@@ -106,6 +164,42 @@ exports.createProduct = (req, res) => {
                 });
             }
         })
+
+    })
+
+}
+
+exports.deleteProduct = (req, res) => {
+    const id = req.product.id.S;
+    if (!req.product) {
+        return res.status(400).json({
+            message: "Kindly send a valid product id",
+            error: "No product found for the given id",
+            operation: "failure"
+        })
+    }
+
+    const params = {
+        TableName: tables.products,
+        Key: {
+            id: {S: id.toString()}
+        }
+    };
+
+    db.deleteItem(params, (err, data) => {
+        if (err) {
+            console.log(err)
+            return res.status(400).json({
+                message: "Failed to delete the product",
+                error: err,
+                operation: "failure"
+            })
+        } else {
+            return res.status(200).json({
+                message: "Successfully Deleted the product with id: " + id,
+                operation: "success"
+            })
+        }
 
     })
 
