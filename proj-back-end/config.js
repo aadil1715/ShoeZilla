@@ -1,10 +1,11 @@
 const config = {
-    "region" : process.env.REGION.toString(),
-    "tables":{
-        "users" : "users",
-        "products" : "products"
+    "region": process.env.REGION.toString(),
+    "tables": {
+        "users": "users",
+        "products": "products",
+        "orders": "shoezilla-orders"
     },
-    "buckets":{
+    "buckets": {
         "productImages": "product-images-group-12"
     }
 }

@@ -2,6 +2,7 @@ const formidable = require('formidable');
 const fs = require('fs');
 const {buckets, tables, region} = require('../config');
 const {v4: uuid} = require('uuid');
+const attr = require('dynamodb-data-types').AttributeValue;
 
 // Aws Configuration
 const AWS = require('aws-sdk');
@@ -10,6 +11,7 @@ const db = new AWS.DynamoDB();
 
 exports.getProductById = (req, res, next, id) => {
 
+    console.log("Getting the product details...");
     if (!id) {
         return res.send("Invalid Id");
     }
