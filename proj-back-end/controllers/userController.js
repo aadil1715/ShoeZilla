@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 const {region, tables} = require('../config');
 
+
 AWS.config.update({region})
 
 const docClient = new AWS.DynamoDB.DocumentClient({
@@ -28,7 +29,6 @@ async function listAllUsers() {
 }
 
 
-
 exports.addUser = async (req, res) => {
 
     const {email} = req.body;
@@ -42,9 +42,17 @@ exports.addUser = async (req, res) => {
     db.putItem(params, ((err, data) => {
         if (err) {
             console.log("Error Happened While saving the user: " + err)
-            return res.status(500).send(err);
+            return res.status(400).json({
+                message: "Failed to Save the user to DB!",
+                error: err,
+                operation: "failure"
+            })
         } else {
-            res.status(200).send("User Added to the DB: " + email);
+            return res.status(201).json({
+                message: "Successfully saved user to DB!",
+                data: data,
+                operation: "success"
+            })
         }
     }))
 }
