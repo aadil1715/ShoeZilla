@@ -3,7 +3,6 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const debug = require('debug')('index:');
 const productRouter = require("./routes/productRouter");
 const orderRouter = require("./routes/orderRouter");
 const userRouter = require('./routes/userRoute');
@@ -11,7 +10,7 @@ const userRouter = require('./routes/userRoute');
 
 // App Initialization
 const app = express();
-const port = process.env.PORT || 5000;
+const port =  process.env.PORT;
 
 
 // Middleware
@@ -35,6 +34,5 @@ app.use((req, res) => {
 
 // Start listening to the requests
 app.listen(port, () => {
-    debug("hey");
     console.log("Started server on the port: " + port);
 })

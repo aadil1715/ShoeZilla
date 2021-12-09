@@ -1,12 +1,21 @@
+// Aws Configuration
+require('dotenv').config();
+const AWS = require('aws-sdk');
+const AWS_CONFIG = {
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    accessSecretKey: process.env.AWS_SECRET_KEY,
+    accessSessionToken: process.env.AWS_SESSION_TOKEN,
+    region: "us-east-1"
+}
+AWS.config.update(AWS_CONFIG)
+
+
 const formidable = require('formidable');
 const fs = require('fs');
 const {buckets, tables, region} = require('../config');
 const {v4: uuid} = require('uuid');
 const attr = require('dynamodb-data-types').AttributeValue;
 
-// Aws Configuration
-const AWS = require('aws-sdk');
-AWS.config.update({region})
 const db = new AWS.DynamoDB();
 
 exports.getProductById = (req, res, next, id) => {
