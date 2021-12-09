@@ -1,11 +1,19 @@
+require('dotenv').config();
 const AWS = require('aws-sdk');
+const AWS_CONFIG = {
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    accessSecretKey: process.env.AWS_SECRET_KEY,
+    accessSessionToken: process.env.AWS_SESSION_TOKEN,
+    region: "us-east-1"
+}
+AWS.config.update(AWS_CONFIG)
+
 const {v4: uuid} = require('uuid');
-const {tables, region} = require("../config");
-const {log} = require("debug");
+const {tables} = require("../config");
 const ATTR = require('dynamodb-data-types').AttributeValue
 
 //DB Configuration!
-AWS.config.update({region})
+
 const db = new AWS.DynamoDB();
 const dbClient = new AWS.DynamoDB.DocumentClient();
 

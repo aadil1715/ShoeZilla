@@ -1,4 +1,14 @@
+// Aws Configuration
+require('dotenv').config();
 const AWS = require('aws-sdk');
+const AWS_CONFIG = {
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    accessSecretKey: process.env.AWS_SECRET_KEY,
+    accessSessionToken: process.env.AWS_SESSION_TOKEN,
+    region: "us-east-1"
+}
+AWS.config.update(AWS_CONFIG)
+
 const {region, tables} = require('../config');
 
 
