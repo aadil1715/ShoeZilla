@@ -178,7 +178,7 @@ exports.createProduct = (req, res) => {
         }
 
         // Read the image and upload to s3
-        uploadFileToS3(file, id, res);
+        // uploadFileToS3(file, id, res);
 
         // Get the Shorten URL using bitly!
         let url = `https://${buckets.productImages}.s3.amazonaws.com/${id}.jpg`
