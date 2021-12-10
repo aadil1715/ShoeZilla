@@ -1,6 +1,7 @@
 // Aws Configuration
 require('dotenv').config();
 const AWS = require('aws-sdk');
+
 const AWS_CONFIG = {
     accessKeyId: process.env.AWS_ACCESS_KEY,
     accessSecretKey: process.env.AWS_SECRET_KEY,
@@ -14,6 +15,8 @@ const formidable = require('formidable');
 const fs = require('fs');
 const {buckets, tables, region} = require('../config');
 const {v4: uuid} = require('uuid');
+const {BitlyClient} = require('bitly');
+const {log} = require("debug");
 const attr = require('dynamodb-data-types').AttributeValue;
 
 const db = new AWS.DynamoDB();
@@ -110,12 +113,40 @@ function uploadFileToS3(file, id, res) {
     }
 }
 
+async function getShortenUrl(longUrl) {
+
+    const getMeBitlyToken = async () => {
+        // Create a Secrets Manager client
+        const secretName = process.env.SECRET_NAME;
+
+        const smClient = new AWS.SecretsManager({
+            region: AWS_CONFIG.region
+        });
+        const response = await smClient.getSecretValue({SecretId: secretName}).promise();
+        const secretObject = JSON.parse(response.SecretString);
+        console.log(secretObject)
+        return secretObject['bitlyToken'];
+    }
+
+
+    let result;
+    try {
+        const bitlyToken = await getMeBitlyToken();
+        const bitly = new BitlyClient(bitlyToken, {});
+        result = await bitly.shorten(longUrl);
+    } catch (error) {
+        console.log(error)
+    }
+
+    return result;
+}
+
 exports.createProduct = (req, res) => {
     const form = new formidable.IncomingForm();
     form.keepExtensions = true;
 
     // Parse the form for data
-    form.parse(req, (err, fields, file) => {
+    form.parse(req, async (err, fields, file) => {
 
         if (err) {
             return res.status(400).json({
@@ -149,6 +180,14 @@ exports.createProduct = (req, res) => {
         // Read the image and upload to s3
         uploadFileToS3(file, id, res);
 
+        // Get the Shorten URL using bitly!
+        let url = `https://${buckets.productImages}.s3.amazonaws.com/${id}.jpg`
+        if (process.env.SHORT_URL.toString() === "true" || process.env.SHORT_URL.toString().includes("true")) {
+            const shortenUrlResponse = await getShortenUrl(url);
+            const shortenUrl = shortenUrlResponse.link;
+            url = shortenUrl === undefined ? url : shortenUrl;
+        }
+
         // Upload the product details to DynamoDB
         // Build DynamoDB Params
         const productParams = {
@@ -159,7 +198,7 @@ exports.createProduct = (req, res) => {
                 description: {S: description},
                 price: {N: price.toString()},
                 stock: {N: stock.toString()},
-                url: {S: `https://${buckets.productImages}.s3.amazonaws.com/${id}.jpg`}
+                url: {S: url.toString()}
             }
         }
 
@@ -237,8 +276,8 @@ exports.updateProduct = (req, res) => {
             id: {S: id},
             name: {S: name || req.product.name.S},
             description: {S: description || req.product.description.S},
-            price: {N: price.toString() },
-            stock: {N: stock.toString() }
+            price: {N: price.toString()},
+            stock: {N: stock.toString()}
         }
     }
 

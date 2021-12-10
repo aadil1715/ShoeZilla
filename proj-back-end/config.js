@@ -1,3 +1,4 @@
+
 const config = {
     "tables": {
         "users": "users",
@@ -8,5 +9,6 @@ const config = {
         "productImages": "product-images-group-12"
     }
 }
+
 
 module.exports = config;
