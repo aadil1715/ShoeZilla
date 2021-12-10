@@ -2,6 +2,8 @@ require('dotenv').config()
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const cors = require('cors');
+const debug = require('debug')('index:');
 const productRouter = require("./routes/productRouter");
 const orderRouter = require("./routes/orderRouter");
 const userRouter = require('./routes/userRoute');
@@ -27,19 +29,15 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser())
 
 
+
 // Routers
 app.use('/', productRouter);
 app.use('/', orderRouter);
 app.use('/', userRouter);
 
-app.use((req, res) => {
-    return res.status(404).json({
-        message: 'You are looking for a page that doesnt exist on the backend.....Check the route you are hitting!',
-        error: "Page not Found!"
-    })
-})
 
 // Start listening to the requests
 app.listen(port, () => {
+    debug("hey");
     console.log("Started server on the port: " + port);
 })

@@ -32,8 +32,9 @@ export default function Signup() {
         password,
       }
     );
+    console.log(res.data);
     if (res.data.statusCode == 400) {
-      setMsg("Username already exist!");
+      setMsg(res.data.body);
       return;
     }
     navigator("/login");
