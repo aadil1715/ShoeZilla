@@ -178,7 +178,7 @@ exports.createProduct = (req, res) => {
         }
 
         // Read the image and upload to s3
-        // uploadFileToS3(file, id, res);
+        uploadFileToS3(file, id, res);
 
         // Get the Shorten URL using bitly!
         let url = `https://${buckets.productImages}.s3.amazonaws.com/${id}.jpg`
@@ -187,16 +187,6 @@ exports.createProduct = (req, res) => {
             const shortenUrl = shortenUrlResponse.link;
             url = shortenUrl === undefined ? url : shortenUrl;
         }
-
-        const response = {
-            statusCode: 200,
-            headers: {
-              "Access-Control-Allow-Origin" : "*", // Required for CORS support to work
-              "Access-Control-Allow-Credentials" : true // Required for cookies, authorization headers with HTTPS
-            },
-            body: JSON.stringify({ "message": "Hello World!" })
-          };
-          return res.json(response);
 
         // Upload the product details to DynamoDB
         // Build DynamoDB Params
@@ -212,23 +202,22 @@ exports.createProduct = (req, res) => {
             }
         }
 
-        // db.putItem(productParams, (err, data) => {
-        //     if (err) {
-        //         console.log("Error Happened While creating the product: " + err)
-        //         return res.status(500).json({
-        //             message: "Failed to create the product",
-        //             error: err,
-        //             operation: "failure"
-        //         });
-        //     } else {
-        //         // console.log(`Successfully Created the product ${name} with id: ${id}`);
-        //         // res.status(200).json({
-        //         //     message: `Successfully Created the product ${name} with id: ${id}`,
-        //         //     operation: "success"
-        //         // });
-                
-        //     }
-        // })
+        db.putItem(productParams, (err, data) => {
+            if (err) {
+                console.log("Error Happened While creating the product: " + err)
+                return res.status(500).json({
+                    message: "Failed to create the product",
+                    error: err,
+                    operation: "failure"
+                });
+            } else {
+                console.log(`Successfully Created the product ${name} with id: ${id}`);
+                res.status(200).json({
+                    message: `Successfully Created the product ${name} with id: ${id}`,
+                    operation: "success"
+                });
+            }
+        })
 
     })
 
