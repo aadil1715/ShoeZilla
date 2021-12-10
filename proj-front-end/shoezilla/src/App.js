@@ -117,6 +117,10 @@ export default class App extends Component {
     this.clearCart();
   };
 
+  listOrders = () => {
+    
+  }
+
   render() {
     return (
       <Context.Provider
@@ -187,9 +191,14 @@ export default class App extends Component {
                   </Link>
                 </>
                 ) : (
+                  <>
+                  <Link to="/your-orders" onClick={this.listOrders} className="navbar-item">
+                    Your orders
+                  </Link>
                   <Link to="/" onClick={this.logout} className="navbar-item">
                     Logout
                   </Link>
+                  </>
                 )}
               </div>
             </nav>
@@ -200,6 +209,7 @@ export default class App extends Component {
               <Route exact path="/add-product" element={<AddProduct/>} />
               <Route exact path="/products" element={<ProductList/>} />
               <Route exact path="/signup" element={<Signup />} />
+              <Route exact path="/your-orders" element={<YourOrders/>} />
             </Routes>
           </div>
         </Router>
