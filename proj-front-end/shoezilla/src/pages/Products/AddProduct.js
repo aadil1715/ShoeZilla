@@ -25,7 +25,7 @@ class AddProduct extends Component {
       const id = Math.random().toString(36).substring(2) + Date.now().toString(36);
       
       await axios.post(
-        'https://8nzmg2zfe6.execute-api.us-east-1.amazonaws.com/product/add',
+        'https://pbml1nkxhh.execute-api.us-east-1.amazonaws.com/Devq',
         { id, name, price, stock, url, description }
         
       )

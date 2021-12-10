@@ -211,11 +211,20 @@ exports.createProduct = (req, res) => {
                     operation: "failure"
                 });
             } else {
-                console.log(`Successfully Created the product ${name} with id: ${id}`);
-                res.status(200).json({
-                    message: `Successfully Created the product ${name} with id: ${id}`,
-                    operation: "success"
-                });
+                // console.log(`Successfully Created the product ${name} with id: ${id}`);
+                // res.status(200).json({
+                //     message: `Successfully Created the product ${name} with id: ${id}`,
+                //     operation: "success"
+                // });
+                const response = {
+                    statusCode: 200,
+                    headers: {
+                      "Access-Control-Allow-Origin" : "*", // Required for CORS support to work
+                      "Access-Control-Allow-Credentials" : true // Required for cookies, authorization headers with HTTPS
+                    },
+                    body: JSON.stringify({ "message": "Hello World!" })
+                  };
+                  return response;
             }
         })
 

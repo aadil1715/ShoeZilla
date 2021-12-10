@@ -118,7 +118,7 @@ export default class App extends Component {
   };
 
   listOrders = () => {
-    
+
   }
 
   render() {
@@ -209,7 +209,7 @@ export default class App extends Component {
               <Route exact path="/add-product" element={<AddProduct/>} />
               <Route exact path="/products" element={<ProductList/>} />
               <Route exact path="/signup" element={<Signup />} />
-              <Route exact path="/your-orders" element={<YourOrders/>} />
+              {/* <Route exact path="/your-orders" element={<YourOrders/>} /> */}
             </Routes>
           </div>
         </Router>
