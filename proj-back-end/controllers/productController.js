@@ -48,7 +48,7 @@ exports.getProductById = (req, res, next, id) => {
     })
 
 }
-
+// Get a product
 exports.getAProduct = (req, res) => {
     if (!req.product) {
         return res.status(400).json({

@@ -11,8 +11,10 @@ const userRouter = require('./routes/userRoute');
 
 // App Initialization
 const app = express();
+const cors = require('cors');
+// Middleware
 app.use(cors());
-const port = process.env.PORT || 5050;
+const port =  process.env.PORT || 5000;
 
 //Adding manual headers
 app.use(function (req, res, next) {
@@ -22,7 +24,6 @@ app.use(function (req, res, next) {
     next();
 });
 
-// Middleware
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser())

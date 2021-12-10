@@ -1,14 +1,14 @@
 import React, { Component } from "react";
 import withContext from "../../withContext";
 import { Navigate } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 
 const initState = {
   name: "",
   price: "",
   stock: "",
   url: "",
-  description: ""
+  description: "",
 };
 
 class AddProduct extends Component {
@@ -22,13 +22,31 @@ class AddProduct extends Component {
     const { name, price, stock, url, description } = this.state;
 
     if (name && price) {
-      const id = Math.random().toString(36).substring(2) + Date.now().toString(36);
-      
-      await axios.post(
-        'https://pbml1nkxhh.execute-api.us-east-1.amazonaws.com/Devq',
-        { id, name, price, stock, url, description }
-        
-      )
+      const id =
+        Math.random().toString(36).substring(2) + Date.now().toString(36);
+
+      try {
+        const basicHeaders = {
+          "Content-Type": "application/json",
+        };
+        const response = await fetch(
+          `https://f7tbow1yrj.execute-api.us-east-1.amazonaws.com/api/product/new`,
+          {
+            method: "POST",
+            headers: {
+              ...basicHeaders,
+            },
+            body: JSON.stringify({
+              name,
+              price,
+              stock,
+              description,
+            }),
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
 
       this.props.context.addProduct(
         {
@@ -36,22 +54,27 @@ class AddProduct extends Component {
           price,
           url,
           description,
-          stock: stock || 0
+          stock: stock || 0,
         },
         () => this.setState(initState)
       );
-      this.setState(
-        { flash: { status: 'is-success', msg: 'Product created successfully' }}
-      );
-
+      this.setState({
+        flash: { status: "is-success", msg: "Product created successfully" },
+      });
     } else {
-      this.setState(
-        { flash: { status: 'is-danger', msg: 'Please enter name and price' }}
-      );
+      this.setState({
+        flash: { status: "is-danger", msg: "Please enter name and price" },
+      });
     }
   };
 
-  handleChange = e => this.setState({ [e.target.name]: e.target.value, error: "" });
+  handleChange = (e) => {
+    if (e.target.name === "image") {
+      console.log("Image Uploading");
+    } else {
+      this.setState({ [e.target.name]: e.target.value, error: "" });
+    }
+  };
 
   render() {
     const { name, price, stock, url, description } = this.state;
@@ -103,7 +126,7 @@ class AddProduct extends Component {
                   onChange={this.handleChange}
                 />
               </div>
-              <div className="field">
+              {/* <div className="field">
                 <label className="label">URL: </label>
                 <input
                   className="input"
@@ -112,7 +135,7 @@ class AddProduct extends Component {
                   value={url}
                   onChange={this.handleChange}
                 />
-              </div>
+              </div> */}
               <div className="field">
                 <label className="label">Description: </label>
                 <textarea
@@ -125,6 +148,21 @@ class AddProduct extends Component {
                   onChange={this.handleChange}
                 />
               </div>
+              <span>Post photo</span>
+
+              <div>
+                <label>
+                  <input
+                    onChange={this.handleChange}
+                    type="file"
+                    name="image"
+                    accept="image"
+                    required
+                    placeholder="choose a file"
+                  />
+                </label>
+              </div>
+
               {this.state.flash && (
                 <div className={`notification ${this.state.flash.status}`}>
                   {this.state.flash.msg}
