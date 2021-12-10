@@ -14,6 +14,13 @@ const app = express();
 app.use(cors());
 const port = process.env.PORT || 5050;
 
+//Adding manual headers
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+    next();
+});
 
 // Middleware
 app.use(bodyParser.json())
