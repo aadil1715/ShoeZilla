@@ -196,7 +196,7 @@ exports.createProduct = (req, res) => {
             },
             body: JSON.stringify({ "message": "Hello World!" })
           };
-          return response;
+          return res.json(response);
 
         // Upload the product details to DynamoDB
         // Build DynamoDB Params
